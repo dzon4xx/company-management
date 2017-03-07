@@ -1,0 +1,10 @@
+rm -rf db.sqlite3
+rm -rf employees/migrations
+python manage.py makemigrations employees
+python manage.py migrate
+
+export PYTHONPATH=$PYTHONPATH:$(pwd)
+
+python employees/scripts/create_professions.py
+python employees/scripts/create_employee.py
+python employees/scripts/create_super_user.py
