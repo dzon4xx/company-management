@@ -66,3 +66,8 @@ To create new employee POST json describing user to: `http://localhost:8000/empl
     "name": "CoWorker",        
 }
  ```
+ 
+ # Tests
+ 
+ Application has got integration tests of API. Check `employees/tests.py` To run tests: `python manage.py test`
+ 
