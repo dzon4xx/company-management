@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.views import APIView
 
+from employees import APP_NAME
 from employees.models import Employee, Profession
 from employees.serializers import EmployeeSerializer, ProfessionSerializer
 
@@ -22,7 +23,6 @@ class EmployeeList(APIView):
                 filter_type = request.query_params['filter']
                 try:
                     getattr(Employee, filter_type)
-                    print(filter_type)
                 except AttributeError:
                     return Response('Employee has no field {}'.format(filter_type), status.HTTP_400_BAD_REQUEST)
             except KeyError:
@@ -30,9 +30,10 @@ class EmployeeList(APIView):
             else:
                 filter_value = request.query_params.get('value', '')
                 column_name = Employee.__name__.lower()
+                table_name = APP_NAME
                 employees = Employee.objects\
-                    .raw('select * from {}s_{} where {} like "%{}%";'
-                    .format(column_name, column_name, filter_type, filter_value))
+                    .raw('select * from {}_{} where {} like "%{}%";'
+                    .format(table_name, column_name, filter_type, filter_value))
 
         serializer = EmployeeSerializer(employees, many=True, context={'request': request})
         return Response(serializer.data)
@@ -93,8 +94,8 @@ class ProfessionDetail(APIView):
 
 @api_view()
 def api_root(request, format=None):
-    return Response({Employee.__name__.lower() + 's': reverse(EmployeeList.rev_name, request=request, format=format),
-                     Profession.__name__.lower() + 's': reverse(ProfessionList.rev_name, request=request, format=format)})
+    return Response({Employee.list_name: reverse(EmployeeList.rev_name, request=request, format=format),
+                     Profession.list_name: reverse(ProfessionList.rev_name, request=request, format=format)})
 
 
 # monkey patch classes
